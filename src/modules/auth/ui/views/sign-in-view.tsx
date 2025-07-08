@@ -14,7 +14,14 @@ import { useTRPC } from "@/trpc/client";
 import { loginSchema } from "../../schemas";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -36,7 +43,7 @@ export const SignInView = () => {
         await queryClient.invalidateQueries(trpc.auth.session.queryFilter());
         router.push("/");
       },
-    })
+    }),
   );
 
   const form = useForm<z.infer<typeof loginSchema>>({
@@ -56,13 +63,25 @@ export const SignInView = () => {
     <div className="grid grid-cols-1 lg:grid-cols-5">
       <div className="bg-[#F4F4F0] h-screen w-full lg:col-span-3 overflow-y-auto">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-8 p-4 lg:p-16">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-col gap-8 p-4 lg:p-16"
+          >
             <div className="flex items-center justify-between mb-8">
               <Link href="/">
-                <span className={cn("text-2xl font-semibold", poppins.className)}>funroad</span>
+                <span
+                  className={cn("text-2xl font-semibold", poppins.className)}
+                >
+                  funroad
+                </span>
               </Link>
 
-              <Button variant="ghost" size="sm" className="text-base border-none underline" asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-base border-none underline"
+                asChild
+              >
                 <Link prefetch href="sign-in">
                   Sign up
                 </Link>
@@ -116,7 +135,11 @@ export const SignInView = () => {
 
       <div
         className="h-screen w-full lg:col-span-2 hidden lg:block"
-        style={{ backgroundImage: "url('/auth-bg.png')", backgroundSize: "cover", backgroundPosition: "center" }}
+        style={{
+          backgroundImage: "url('/auth-bg.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
       />
     </div>
   );
