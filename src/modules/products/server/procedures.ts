@@ -3,7 +3,7 @@ import { Sort, Where } from "payload";
 
 import { sortValues } from "../search-params";
 
-import { Category, Media } from "@/payload-types";
+import { Category, Media, Tenant } from "@/payload-types";
 import { baseProcedure, createTRPCRouter } from "@/trpc/init";
 import { DEFAULT_LIMIT } from "@/constants";
 
@@ -17,8 +17,9 @@ export const productsRouter = createTRPCRouter({
         minPrice: z.string().nullable().optional(),
         maxPrice: z.string().nullable().optional(),
         tags: z.array(z.string()).nullable().optional(),
-        sort: z.enum(sortValues),
-      }),
+        sort: z.enum(sortValues).nullable().optional(),
+        tenantSlug: z.string().nullable().optional(),
+      })
     )
     .query(async ({ ctx, input }) => {
       const where: Where = {};
@@ -74,16 +75,18 @@ export const productsRouter = createTRPCRouter({
         const parentCategory = formattedData[0];
 
         if (parentCategory) {
-          subcategoriesSlugs.push(
-            ...parentCategory.subcategories.map(
-              (subcategory) => subcategory.slug,
-            ),
-          );
+          subcategoriesSlugs.push(...parentCategory.subcategories.map((subcategory) => subcategory.slug));
 
           where["category.slug"] = {
             in: [parentCategory.slug, ...subcategoriesSlugs],
           };
         }
+      }
+
+      if (input.tenantSlug) {
+        where["tenant.slug"] = {
+          equals: input.tenantSlug,
+        };
       }
 
       if (input.tags && input.tags.length > 0) {
@@ -94,7 +97,7 @@ export const productsRouter = createTRPCRouter({
 
       const data = await ctx.db.find({
         collection: "products",
-        depth: 1, // Populate "category" and "image"
+        depth: 2, // Populate "category", "image", "tenant" & "tentant.image"
         where,
         sort,
         page: input.cursor,
@@ -106,6 +109,9 @@ export const productsRouter = createTRPCRouter({
         docs: data.docs.map((doc) => ({
           ...doc,
           image: doc.image as Media | null,
+          tenant: doc.tenant as Tenant & {
+            image: Media | null;
+          },
         })),
       };
     }),
