@@ -138,36 +138,70 @@ const categories = [
 ];
 
 const seed = async () => {
-  const payload = await getPayload({ config });
+  try {
+    const payload = await getPayload({ config });
 
-  for (const category of categories) {
-    const parentCategory = await payload.create({
-      collection: "categories",
+    // Create admin tenant
+    const adminTenant = await payload.create({
+      collection: "tenants",
       data: {
-        name: category.name,
-        slug: category.slug,
-        color: category.color,
-        parent: null,
+        name: "admin",
+        slug: "admin",
+        stripeAccountId: "admin",
       },
     });
 
-    for (const subCategory of category.subcategories || []) {
-      await payload.create({
+    // Create admin user
+    await payload.create({
+      collection: "users",
+      data: {
+        email: "admin@demo.com",
+        password: "demo",
+        roles: ["super-admin"],
+        username: "admin",
+        tenants: [
+          {
+            tenant: adminTenant.id,
+          },
+        ],
+      },
+    });
+
+    for (const category of categories) {
+      const parentCategory = await payload.create({
         collection: "categories",
         data: {
-          name: subCategory.name,
-          slug: subCategory.slug,
-          parent: parentCategory.id,
+          name: category.name,
+          slug: category.slug,
+          color: category.color,
+          parent: null,
         },
       });
+
+      if (category.subcategories) {
+        for (const subCategory of category.subcategories) {
+          await payload.create({
+            collection: "categories",
+            data: {
+              name: subCategory.name,
+              slug: subCategory.slug,
+              parent: parentCategory.id,
+            },
+          });
+        }
+      }
     }
+
+    console.log("Seed complete");
+
+    process.exit(0);
+  } catch (error) {
+    console.log("Seeding failed", error);
+
+    process.exit(1);
   }
 };
 
-try {
-  await seed();
+seed();
 
-  process.exit(0);
-} catch (error) {
-  console.log(error);
-}
+// 10:14:10

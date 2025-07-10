@@ -6,7 +6,6 @@ import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { SubcategoryMenu } from "./subcategory-menu";
-import { useDropdownPosition } from "./use-dropdown-position";
 import { CategoriesGetManyOutput } from "@/modules/categories/types";
 
 interface Props {
@@ -18,9 +17,6 @@ interface Props {
 export const CategoryDropdown = ({ category, isActive, isNavigationHovered }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { getDropdownPosition } = useDropdownPosition(dropdownRef);
-
-  const dropdownPosition = getDropdownPosition();
 
   const onMouseEnter = () => {
     if (category.subcategories) {
@@ -68,7 +64,7 @@ export const CategoryDropdown = ({ category, isActive, isNavigationHovered }: Pr
         )}
       </div>
 
-      <SubcategoryMenu category={category} isOpen={isOpen} position={dropdownPosition} />
+      <SubcategoryMenu category={category} isOpen={isOpen} />
     </div>
   );
 };
