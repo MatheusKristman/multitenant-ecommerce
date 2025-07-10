@@ -8,6 +8,26 @@ import { baseProcedure, createTRPCRouter } from "@/trpc/init";
 import { DEFAULT_LIMIT } from "@/constants";
 
 export const productsRouter = createTRPCRouter({
+  getOne: baseProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const product = await ctx.db.findByID({
+        collection: "products",
+        id: input.id,
+        depth: 2, // Load the "product.image", "product.tenant" and "product.tenant.image"
+      });
+
+      return {
+        ...product,
+        image: product.image as Media | null,
+        cover: product.cover as Media | null,
+        tenant: product.tenant as Tenant & { image: Media | null },
+      };
+    }),
   getMany: baseProcedure
     .input(
       z.object({
@@ -19,7 +39,7 @@ export const productsRouter = createTRPCRouter({
         tags: z.array(z.string()).nullable().optional(),
         sort: z.enum(sortValues).nullable().optional(),
         tenantSlug: z.string().nullable().optional(),
-      })
+      }),
     )
     .query(async ({ ctx, input }) => {
       const where: Where = {};
@@ -75,7 +95,11 @@ export const productsRouter = createTRPCRouter({
         const parentCategory = formattedData[0];
 
         if (parentCategory) {
-          subcategoriesSlugs.push(...parentCategory.subcategories.map((subcategory) => subcategory.slug));
+          subcategoriesSlugs.push(
+            ...parentCategory.subcategories.map(
+              (subcategory) => subcategory.slug,
+            ),
+          );
 
           where["category.slug"] = {
             in: [parentCategory.slug, ...subcategoriesSlugs],
