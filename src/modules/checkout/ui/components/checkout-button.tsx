@@ -7,25 +7,29 @@ import { cn, generateTenantURL } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 interface CheckoutButtonProps {
-  className?: string;
-  hideIfEmpty?: boolean;
-  tenantSlug: string;
+    className?: string;
+    hideIfEmpty?: boolean;
+    tenantSlug: string;
 }
 
 export const CheckoutButton = ({
-  className,
-  hideIfEmpty,
-  tenantSlug,
+    className,
+    hideIfEmpty,
+    tenantSlug,
 }: CheckoutButtonProps) => {
-  const { totalItems } = useCart(tenantSlug);
+    const { totalItems } = useCart(tenantSlug);
 
-  if (hideIfEmpty && totalItems === 0) return null;
+    if (hideIfEmpty && totalItems === 0) return null;
 
-  return (
-    <Button variant="elevated" asChild className={cn("bg-white", className)}>
-      <Link href={`${generateTenantURL(tenantSlug)}/checkout`}>
-        <ShoppingCartIcon /> {totalItems > 0 ? totalItems : ""}
-      </Link>
-    </Button>
-  );
+    return (
+        <Button
+            variant="elevated"
+            asChild
+            className={cn("bg-white", className)}
+        >
+            <Link href={`${generateTenantURL(tenantSlug)}/checkout`}>
+                <ShoppingCartIcon /> {totalItems > 0 ? totalItems : ""}
+            </Link>
+        </Button>
+    );
 };

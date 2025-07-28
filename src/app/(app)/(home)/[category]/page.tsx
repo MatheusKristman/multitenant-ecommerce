@@ -8,24 +8,28 @@ import { loadProductFilters } from "@/modules/products/search-params";
 import { ProductListView } from "@/modules/products/ui/views/product-list-view";
 
 interface Props {
-  params: Promise<{ category: string }>;
-  searchParams: Promise<SearchParams>;
+    params: Promise<{ category: string }>;
+    searchParams: Promise<SearchParams>;
 }
 
 const Page = async ({ params, searchParams }: Props) => {
-  const { category } = await params;
-  const filters = await loadProductFilters(searchParams);
+    const { category } = await params;
+    const filters = await loadProductFilters(searchParams);
 
-  const queryClient = getQueryClient();
-  void queryClient.prefetchInfiniteQuery(
-    trpc.products.getMany.infiniteQueryOptions({ ...filters, category, limit: DEFAULT_LIMIT })
-  );
+    const queryClient = getQueryClient();
+    void queryClient.prefetchInfiniteQuery(
+        trpc.products.getMany.infiniteQueryOptions({
+            ...filters,
+            category,
+            limit: DEFAULT_LIMIT,
+        }),
+    );
 
-  return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <ProductListView />
-    </HydrationBoundary>
-  );
+    return (
+        <HydrationBoundary state={dehydrate(queryClient)}>
+            <ProductListView />
+        </HydrationBoundary>
+    );
 };
 
 export default Page;

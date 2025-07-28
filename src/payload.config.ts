@@ -21,33 +21,34 @@ const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
 export default buildConfig({
-  admin: {
-    user: Users.slug,
-    importMap: {
-      baseDir: path.resolve(dirname),
+    admin: {
+        user: Users.slug,
+        importMap: {
+            baseDir: path.resolve(dirname),
+        },
     },
-  },
-  collections: [Users, Media, Categories, Products, Tags, Tenants, Orders],
-  editor: lexicalEditor(),
-  secret: process.env.PAYLOAD_SECRET || "",
-  typescript: {
-    outputFile: path.resolve(dirname, "payload-types.ts"),
-  },
-  db: mongooseAdapter({
-    url: process.env.DATABASE_URI || "",
-  }),
-  sharp,
-  plugins: [
-    payloadCloudPlugin(),
-    multiTenantPlugin<Config>({
-      collections: {
-        products: {},
-      },
-      tenantsArrayField: {
-        includeDefaultField: false,
-      },
-      userHasAccessToAllTenants: (user) => Boolean(user?.roles?.includes("super-admin")),
+    collections: [Users, Media, Categories, Products, Tags, Tenants, Orders],
+    editor: lexicalEditor(),
+    secret: process.env.PAYLOAD_SECRET || "",
+    typescript: {
+        outputFile: path.resolve(dirname, "payload-types.ts"),
+    },
+    db: mongooseAdapter({
+        url: process.env.DATABASE_URI || "",
     }),
-    // storage-adapter-placeholder
-  ],
+    sharp,
+    plugins: [
+        payloadCloudPlugin(),
+        multiTenantPlugin<Config>({
+            collections: {
+                products: {},
+            },
+            tenantsArrayField: {
+                includeDefaultField: false,
+            },
+            userHasAccessToAllTenants: (user) =>
+                Boolean(user?.roles?.includes("super-admin")),
+        }),
+        // storage-adapter-placeholder
+    ],
 });
