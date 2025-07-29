@@ -7,6 +7,7 @@ import dynamic from "next/dynamic";
 import { Fragment, useState } from "react";
 import { CheckIcon, LinkIcon, StarIcon } from "lucide-react";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { RichText } from "@payloadcms/richtext-lexical/react";
 
 import { useTRPC } from "@/trpc/client";
 import { formatCurrency, generateTenantURL } from "@/lib/utils";
@@ -118,7 +119,7 @@ export const ProductView = ({ productId, tenantSlug }: ProductViewProps) => {
 
                         <div className="p-6">
                             {data.description ? (
-                                <p>{data.description}</p>
+                                <RichText data={data.description} />
                             ) : (
                                 <p className="font-medium text-muted-foreground italic">
                                     No description provided
@@ -209,6 +210,23 @@ export const ProductView = ({ productId, tenantSlug }: ProductViewProps) => {
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export const ProductViewSkeleton = () => {
+    return (
+        <div className="px-4 lg:px-12 py-10">
+            <div className="border rounded-sm bg-white overflow-hidden">
+                <div className="relative aspect-[3.9] border-b">
+                    <Image
+                        src={"/placeholder.png"}
+                        alt="placeholder"
+                        fill
+                        className="object-cover"
+                    />
                 </div>
             </div>
         </div>
